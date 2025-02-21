@@ -17,6 +17,10 @@ int main(int argc, char* argv[]) {
     print_all_data(eventi);
     plot_3D_distribution(eventi);
     plot_zenith_vs_inPos(eventi);
+    int bundle = muon_bundle(eventi);
+    int nevents = Nevents(eventi);
+    cout << "Il numero di eventi singoli registrati è: " << nevents << endl;
+    cout << "Il nuemero di muoni bundle (muoni per traccia > 2) sono: " << bundle << " e rappresentano il " << (double) bundle/nevents*100 << "%." << endl;
     app.Run();
     return 0;
 }

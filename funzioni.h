@@ -53,4 +53,9 @@ void plot_3D_distribution(const vector<muone>&);
 // Funzione per creare istrogramma Theta vs Punti di entrata
 void plot_zenith_vs_inPos(const vector<muone>&);
 
+// Funzione per calcolare il numero di bundle di muoni
+int muon_bundle(const vector<muone>&);
+
+// Funzione per contare il numero di eventi singolarmente
+int Nevents(const vector<muone>&);
 #endif

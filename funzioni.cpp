@@ -125,8 +125,30 @@ void plot_zenith_vs_inPos(const vector<muone>& eventi){
     zenith->GetYaxis()->SetTitle("Counts [a.u.]");
     zenith->Draw();
     ctheta->SaveAs("theta_vs_inPos.png");
+}
 
+int muon_bundle(const vector<muone>& eventi){
+    int bundle = 0;
+    string last_entry_time = "";
+    for(const auto& e : eventi){
+        if(e.trackID > 0 && e.entry_time!= last_entry_time){
+            last_entry_time = e.entry_time;
+            bundle++;// Conto il bundle una sola volta per tempo
+        }
+    }
+    return bundle;
+}
 
+int Nevents(const vector<muone>& eventi){
+    int nevents = 0;
+    string last_entry_time = "";
+    for(const auto& e : eventi){
+        if(e.entry_time != last_entry_time){
+            last_entry_time = e.entry_time;
+            nevents++;
+        }
+    }
+    return nevents;
 }
 
 
