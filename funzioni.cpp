@@ -147,14 +147,14 @@ void plot_zenith_vs_inPos(const vector<muone>& eventi){
         double theta = acos(e.uz);
         zenith->Fill(cos(theta));
     }
-    zenith->SetLineColor(kBlue);
+    zenith->SetLineColor(kGreen);
     zenith->SetLineWidth(2);
-    zenith->SetFillColorAlpha(kBlue, 0.3);
+    zenith->SetFillColorAlpha(kGreen, 0.3);
     
     zenith->GetXaxis()->SetTitle("cos(#theta)");
     zenith->GetYaxis()->SetTitle("Counts [a.u.]");
     zenith->Draw("HIST");
-    ctheta->SaveAs("theta_vs_inPos.png");
+    ctheta->SaveAs("costheta_plot.png");
 }
 
 int muon_bundle(const vector<muone>& eventi){
@@ -262,9 +262,9 @@ void PeSum_histograms(const vector<muone>& eventi) {
     canvasA->cd();
     one->GetXaxis()->SetTitle("Charge [p.e.]");
     one->GetYaxis()->SetTitle("Counts [a.u.]");
-    one->SetLineColor(kBlue);
+    one->SetLineColor(kRed);
     one->SetLineWidth(2);
-    one->SetFillColorAlpha(kBlue, 0.3);
+    one->SetFillColorAlpha(kRed, 0.3);
     one->Draw();
 
     // Istogrammi bundle
@@ -272,36 +272,55 @@ void PeSum_histograms(const vector<muone>& eventi) {
     gPad->SetGrid();
     two->GetXaxis()->SetTitle("Charge [p.e.]");
     two->GetYaxis()->SetTitle("Counts [a.u.]");
-    two->SetLineColor(kBlue);
+    two->SetLineColor(kRed);
     two->SetLineWidth(2);
-    two->SetFillColorAlpha(kBlue, 0.3);
+    two->SetFillColorAlpha(kRed, 0.3);
     two->Draw();
     canvasB->cd(2);
     gPad->SetGrid();
     three->GetXaxis()->SetTitle("Charge [p.e.]");
     three->GetYaxis()->SetTitle("Counts [a.u.]");
-    three->SetLineColor(kBlue);
+    three->SetLineColor(kRed);
     three->SetLineWidth(2);
-    three->SetFillColorAlpha(kBlue, 0.3);
+    three->SetFillColorAlpha(kRed, 0.3);
     three->Draw();
     canvasB->cd(3);
     gPad->SetGrid();
     four->GetXaxis()->SetTitle("Charge [p.e.]");
     four->GetYaxis()->SetTitle("Counts [a.u.]");
-    four->SetLineColor(kBlue);
+    four->SetLineColor(kRed);
     four->SetLineWidth(2);
-    four->SetFillColorAlpha(kBlue, 0.3);
+    four->SetFillColorAlpha(kRed, 0.3);
     four->Draw();
     canvasB->cd(4);
     gPad->SetGrid();
     five->GetXaxis()->SetTitle("Charge [p.e.]");
     five->GetYaxis()->SetTitle("Counts [a.u.]");
-    five->SetLineColor(kBlue);
+    five->SetLineColor(kRed);
     five->SetLineWidth(2);
-    five->SetFillColorAlpha(kBlue, 0.3);
+    five->SetFillColorAlpha(kRed, 0.3);
     five->Draw();
 
     // Salva i grafici
     canvasA->SaveAs("PeSum_singoli.png");
     canvasB->SaveAs("PeSum_bundle.png");
 }
+
+void Distance_histogram(const vector<muone>& eventi){
+    TCanvas *canval = new TCanvas("canval", "Istogramma Distanza percorsa all'interno del CD", 800, 600);
+    TH1F *dist = new TH1F("Distanza percorsa all'interno del CD", "Distanza percorsa all'interno del CD", 100, 100, 100);
+    dist->StatOverflows(kTRUE);
+    canval->SetGrid();
+    for (const auto& ev : eventi) {
+        dist->Fill(ev.distance);
+    }
+    dist->SetLineColor(kOrange);
+    dist->GetXaxis()->SetTitle("Distance [mm]");
+    dist->GetYaxis()->SetTitle("Counts [a.u.]");
+    dist->SetLineWidth(2);
+    dist->SetFillColorAlpha(kOrange, 0.3);
+    dist->Draw();
+    canval->SaveAs("Distance_plot.png");
+}
+
+

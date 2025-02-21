@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
     }
     total_PeSum_histogram(eventi);
     PeSum_histograms(eventi);
+    Distance_histogram(eventi);
     print_all_data(eventi);
     save_all_data_to_file(eventi, "output.txt");
     vector<muone> sort_eventi_ID = eventi;

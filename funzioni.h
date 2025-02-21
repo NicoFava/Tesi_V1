@@ -74,4 +74,7 @@ void sort_events_by_id(vector<muone>&);
 // Funzione per creare istogramma di energia per muoni singoli e bundle
 void PeSum_histograms(const vector<muone>&);
 
+// Funzione per creare un istogramma delle distanze percorse all'interno del rivelatore
+void Distance_histogram(const vector<muone>&);
+
 #endif
