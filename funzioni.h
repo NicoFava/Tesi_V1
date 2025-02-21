@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <cmath>
+#include <numeric>
 
 // Librerie di ROOT
 #include "TH1F.h"
@@ -37,16 +38,21 @@ struct muone {
     float ux, uy, uz;
     float quality;
     float entry_time, exit_time;
+    double distance;
 };
 
 // Funzione per caricare i dati ROOT in un vettore
 vector<muone> load_root_data(const string&);
 
-// Funzione per Stampare tutti i dati
+// Funzione per stampare tutti i dati
 void print_all_data(const vector<muone>&);
 
-// Funzione per creare un istogramma ROOT
-void create_histogram(const vector<muone>&);
+// Funzione per salvare i dati in un file
+void save_all_data_to_file(const vector<muone>&, const string&);
+
+// Funzione per creare un istogramma della carica
+void create_PeSum_histogram(const vector<muone>&);
+
 // Funzione per creare plot tridimensionale dei punti di entrata
 void plot_3D_distribution(const vector<muone>&);
 
@@ -58,4 +64,7 @@ int muon_bundle(const vector<muone>&);
 
 // Funzione per contare il numero di eventi singolarmente
 int Nevents(const vector<muone>&);
+
+// Funzione per calcolare il tempo medio tra un evento e il successivo (inverso della frequenza)
+float mean_delta_t(const vector<muone>&);
 #endif
