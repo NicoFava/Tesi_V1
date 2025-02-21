@@ -51,7 +51,7 @@ void print_all_data(const vector<muone>&);
 void save_all_data_to_file(const vector<muone>&, const string&);
 
 // Funzione per creare un istogramma della carica
-void create_PeSum_histogram(const vector<muone>&);
+void total_PeSum_histogram(const vector<muone>&);
 
 // Funzione per creare plot tridimensionale dei punti di entrata
 void plot_3D_distribution(const vector<muone>&);
@@ -67,4 +67,11 @@ int Nevents(const vector<muone>&);
 
 // Funzione per calcolare il tempo medio tra un evento e il successivo (inverso della frequenza)
 float mean_delta_t(const vector<muone>&);
+
+// Funzione che mi ordina in maniera crescente in ID
+void sort_events_by_id(vector<muone>&);
+
+// Funzione per creare istogramma di energia per muoni singoli e bundle
+void PeSum_histograms(const vector<muone>&);
+
 #endif

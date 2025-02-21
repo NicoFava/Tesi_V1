@@ -96,15 +96,18 @@ void save_all_data_to_file(const vector<muone>& eventi, const string& filename =
     cout << "Dati salvati con successo in " << filename << "!" << endl;
 }
 
-void create_PeSum_histogram(const vector<muone>& eventi) {
+void total_PeSum_histogram(const vector<muone>& eventi) {
     TCanvas *canvas = new TCanvas("canvas", "Istogramma Energia", 800, 600);
-    TH1F *charge = new TH1F("histo", "Distribuzione Energia", 100, 0, 1000);
+    TH1F *charge = new TH1F("Distribuzione dell'energia", "Distribuzione dell'energia", 100, 100, 100);
     charge->StatOverflows(kTRUE);
+    canvas->SetGrid();
     for (const auto& ev : eventi) {
         charge->Fill(ev.PeSum);
     }
     charge->GetXaxis()->SetTitle("Charge [p.e.]");
     charge->GetYaxis()->SetTitle("Counts [a.u.]");
+    charge->SetLineWidth(2);
+    charge->SetFillColorAlpha(kBlue, 0.3);
     charge->Draw();
     canvas->SaveAs("PeSum_plot.png");
 }
@@ -135,18 +138,15 @@ void plot_3D_distribution(const vector<muone>& eventi){
 }
 
 void plot_zenith_vs_inPos(const vector<muone>& eventi){
+    gStyle->SetOptStat(1);  // Abilita il box delle statistiche
     TCanvas *ctheta = new TCanvas("ctheta", "Distribuzione dei punti di entrata vs Angolo di Zenith", 800, 600);
-    TH1F *zenith = new TH1F("histoz", "Distribuzione Angolare", 100, 100, 100);
+    TH1F *zenith = new TH1F("Distribuzione angolare", "Distribuzione angolare", 100, 100, 100);
     zenith->StatOverflows(kTRUE);
     ctheta->SetGrid();
     for(const auto& e:eventi){
-        double r = sqrt(e.entry_x*e.entry_x+e.entry_y*e.entry_y+e.entry_z*e.entry_z);
-        if(r == 0) continue;
-
-        double theta = acos(-e.uz); // Messo negativo in sono "verso il basso"
+        double theta = acos(e.uz);
         zenith->Fill(cos(theta));
     }
-    zenith->SetTitle("cos(#theta) vs inPos");
     zenith->SetLineColor(kBlue);
     zenith->SetLineWidth(2);
     zenith->SetFillColorAlpha(kBlue, 0.3);
@@ -195,8 +195,6 @@ float mean_delta_t(const vector<muone>& eventi){
             // Se l'intervallo è negativo, c'è un errore nell'ordine degli eventi
             if (delta_t < 0) {
                 cerr << "Attenzione: Intervallo di tempo negativo rilevato tra due eventi!" << endl;
-                cout << "aaaa" <<  eventi[i].eventID << endl;
-                cerr << delta_t << endl;
             } else {
                 intervalli.push_back(delta_t);
             }
@@ -208,4 +206,102 @@ float mean_delta_t(const vector<muone>& eventi){
     double media = somma / intervalli.size();
 
     return media;
+}
+
+void sort_events_by_id(vector<muone>& eventi) {
+    sort(eventi.begin(), eventi.end(), [](const muone& a, const muone& b) {
+        return a.eventID < b.eventID;
+    });
+}
+
+void PeSum_histograms(const vector<muone>& eventi) {
+    TCanvas *canvasA = new TCanvas("canvasA", "Istogramma Energia - Muoni Singoli", 800, 600);
+    TCanvas *canvasB = new TCanvas("canvasB", "Istogramma Energia - Muoni Bundle", 800, 600);
+    canvasB->Divide(2,2);
+
+    TH1F *one = new TH1F("Muoni singoli", "Distribuzione Energia - Muoni Singoli", 100, 100, 100);
+    TH1F *two = new TH1F("Muoni doppi", "Distribuzione Energia - Muoni doppi", 100, 100, 100);
+    TH1F *three = new TH1F("Muoni tripli", "Distribuzione Energia - Muoni tripli", 100, 100, 100);
+    TH1F *four = new TH1F("Muoni quadrupli", "Distribuzione Energia - Muoni quadrupli", 100, 100, 100);
+    TH1F *five = new TH1F("Muoni > quintupli", "Distribuzione Energia - Muoni > quintupli", 100, 100, 100);
+
+    canvasA->SetGrid();
+
+    size_t i = 0;
+    while (i < eventi.size()) {
+        // Prendiamo il tempo di riferimento del primo evento del gruppo
+        int current_fSec = eventi[i].fSec;
+        int current_fNanosec = eventi[i].fNanosec;
+        double totalPeSum = 0.0;
+        int numMuoni = 0;
+
+        // Raggruppa tutti gli eventi con lo stesso tempo (fSec e fNanosec uguali) e somma PeSum
+        while (i < eventi.size() && 
+               eventi[i].fSec == current_fSec && 
+               eventi[i].fNanosec == current_fNanosec) {
+            totalPeSum += eventi[i].PeSum;
+            numMuoni++;
+            i++;
+        }
+
+        // Inserisci nei rispettivi istogrammi
+        if (numMuoni == 1) {
+            one->Fill(totalPeSum);
+        } else if (numMuoni == 2) {
+            two->Fill(totalPeSum);
+        } else if (numMuoni == 3) {
+            three->Fill(totalPeSum);
+        } else if (numMuoni == 4) {
+            four->Fill(totalPeSum);
+        } else if (numMuoni >= 5) {
+            five->Fill(totalPeSum);
+        }
+    }
+
+    // Disegna gli istogrammi
+    canvasA->cd();
+    one->GetXaxis()->SetTitle("Charge [p.e.]");
+    one->GetYaxis()->SetTitle("Counts [a.u.]");
+    one->SetLineColor(kBlue);
+    one->SetLineWidth(2);
+    one->SetFillColorAlpha(kBlue, 0.3);
+    one->Draw();
+
+    // Istogrammi bundle
+    canvasB->cd(1);
+    gPad->SetGrid();
+    two->GetXaxis()->SetTitle("Charge [p.e.]");
+    two->GetYaxis()->SetTitle("Counts [a.u.]");
+    two->SetLineColor(kBlue);
+    two->SetLineWidth(2);
+    two->SetFillColorAlpha(kBlue, 0.3);
+    two->Draw();
+    canvasB->cd(2);
+    gPad->SetGrid();
+    three->GetXaxis()->SetTitle("Charge [p.e.]");
+    three->GetYaxis()->SetTitle("Counts [a.u.]");
+    three->SetLineColor(kBlue);
+    three->SetLineWidth(2);
+    three->SetFillColorAlpha(kBlue, 0.3);
+    three->Draw();
+    canvasB->cd(3);
+    gPad->SetGrid();
+    four->GetXaxis()->SetTitle("Charge [p.e.]");
+    four->GetYaxis()->SetTitle("Counts [a.u.]");
+    four->SetLineColor(kBlue);
+    four->SetLineWidth(2);
+    four->SetFillColorAlpha(kBlue, 0.3);
+    four->Draw();
+    canvasB->cd(4);
+    gPad->SetGrid();
+    five->GetXaxis()->SetTitle("Charge [p.e.]");
+    five->GetYaxis()->SetTitle("Counts [a.u.]");
+    five->SetLineColor(kBlue);
+    five->SetLineWidth(2);
+    five->SetFillColorAlpha(kBlue, 0.3);
+    five->Draw();
+
+    // Salva i grafici
+    canvasA->SaveAs("PeSum_singoli.png");
+    canvasB->SaveAs("PeSum_bundle.png");
 }
